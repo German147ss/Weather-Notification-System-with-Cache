@@ -1,0 +1,9 @@
+### Registrar un nuevo usuario
+
+POST http://localhost:8082/usuarios
+Content-Type: application/json
+
+{
+    "location_code": "242",
+    "notification_schedule": 24870
+}

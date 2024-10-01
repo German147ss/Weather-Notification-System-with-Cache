@@ -1,0 +1,55 @@
+version: "3.8"
+
+services:
+
+  us3r-service:
+    build:
+      context: ./user-service
+    container_name: us3r-service
+    environment:
+      DB_USER: alfred
+      DB_PASSWORD: 4lfr3d
+      DB_NAME: labora
+      DB_HOST: db
+      DB_PORT: 5432
+      GOPROXY: direct
+    ports:
+      - "8082:8081"
+    depends_on:
+      - db
+    restart: always  # Asegura que el contenedor se reinicie si falla
+
+  db:
+    image: postgres:12
+    environment:
+      POSTGRES_USER: alfred
+      POSTGRES_PASSWORD: 4lfr3d
+      POSTGRES_DB: labora
+    restart: always  # Asegura que el contenedor se reinicie si falla
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  
+  # Redis Service
+  redis:
+    image: redis:alpine
+    container_name: redis-service
+    ports:
+      - "6380:6379"
+
+  # Weather Service
+  weather-service:
+    build:
+      context: ./weather-service
+    container_name: weather-new-service
+    ports:
+      - "8084:8083"
+    environment:
+      REDIS_PORT: 6379
+      REDIS_HOST: redis
+    depends_on:
+      - redis
+ 
+volumes:
+  pgdata:
