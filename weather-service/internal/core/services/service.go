@@ -25,26 +25,21 @@ func New(weatherService ports.WeatherService, cacheService ports.CacheService) *
 
 func (s *WeatherService) GetWeather(city string, ctx context.Context) (*domain.CityWeather, error) {
 
-	// Generate the key for Redis
 	cacheKey := "weather:" + city
 
-	// Try to get the weather from the Redis cache
 	val, err := s.cacheService.Get(ctx, cacheKey)
 	if err == redis.Nil {
-		// Weather not found in cache, make the request to the CPTEC API
 		fmt.Println("Cache miss. Getting data from CPTEC...")
 		weather, err := s.weatherService.GetWeather(city)
 		if err != nil {
 			return nil, err
 		}
 
-		// Convert the structure to JSON to store it in Redis
 		jsonData, err := json.Marshal(weather)
 		if err != nil {
 			return nil, err
 		}
 
-		// Store the result in Redis with a 1 hour expiration
 		err = s.cacheService.Set(ctx, cacheKey, string(jsonData), time.Hour)
 		if err != nil {
 			return nil, err
@@ -56,7 +51,6 @@ func (s *WeatherService) GetWeather(city string, ctx context.Context) (*domain.C
 		return nil, err
 	}
 
-	// Weather found in cache, deserialize it
 	fmt.Printf("cache hit for city: %s", city)
 	var weather domain.CityWeather
 	err = json.Unmarshal([]byte(val), &weather)
@@ -68,7 +62,32 @@ func (s *WeatherService) GetWeather(city string, ctx context.Context) (*domain.C
 
 // SearchIdByName
 func (s *WeatherService) SearchIdByName(name string, ctx context.Context) (string, error) {
-	return s.weatherService.SearchIdByName(name)
+	// Generate the key for Redis
+	cacheKey := "city-id:" + name
+
+	// Try to get the city ID from the Redis cache
+	val, err := s.cacheService.Get(ctx, cacheKey)
+	if err == redis.Nil {
+		fmt.Println("Cache miss. Getting city ID from CPTEC...")
+		cityId, err := s.weatherService.SearchIdByName(name)
+		if err != nil {
+			return "", err
+		}
+
+		err = s.cacheService.Set(ctx, cacheKey, cityId, 24*time.Hour)
+		if err != nil {
+			return "", err
+		}
+
+		fmt.Println("City ID cached for name:", name)
+		return cityId, nil
+	} else if err != nil {
+		return "", err
+	}
+
+	// City ID found in cache, return it
+	fmt.Printf("Cache hit for city name: %s", name)
+	return val, nil
 }
 
 // func to get WeatherAndWaves
