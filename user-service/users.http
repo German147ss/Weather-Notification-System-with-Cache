@@ -1,3 +1,5 @@
+//To use the extension, install in vscode: humao.rest-client
+
 ### Registrar un nuevo usuario
 POST http://localhost:8082/register
 Content-Type: application/json
