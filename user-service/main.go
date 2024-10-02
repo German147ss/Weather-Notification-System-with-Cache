@@ -10,7 +10,7 @@ import (
 	"time"
 
 	_ "github.com/lib/pq"
-	//"github.com/streadway/amqp"
+	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 // Estructura del usuario
@@ -53,10 +53,10 @@ func registrarUsuario(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Preparar la consulta SQL para insertar el nuevo usuario
-	sqlInsert := `INSERT INTO user_preferences (location_code, notification_schedule, is_enabled) VALUES ($1, $2, $3) RETURNING id`
+	sqlInsert := `INSERT INTO user_preferences (location_code, notification_schedule) VALUES ($1, $2) RETURNING id`
 
 	// Ejecutar la consulta e insertar el usuario
-	err = DB.QueryRow(sqlInsert, usuario.LocationCode, usuario.NotificationSchedule, usuario.IsEnabled).Scan(&usuario.ID)
+	err = DB.QueryRow(sqlInsert, usuario.LocationCode, usuario.NotificationSchedule).Scan(&usuario.ID)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error al insertar usuario: %v", err), http.StatusInternalServerError)
 		return
@@ -99,14 +99,14 @@ func main() {
 
 	defer DB.Close()
 
-	/* conn, ch, err := connectRabbitMQ()
+	conn, ch, err := connectRabbitMQ()
 	if err != nil {
 		log.Fatalf("Error conectando a RabbitMQ: %v", err)
 	}
 	defer conn.Close()
 	defer ch.Close()
 
-	go consumeUserNotifications(ch) */
+	go consumeUserNotifications(ch)
 
 	// Ruta para registrar un nuevo usuario
 	http.HandleFunc("/usuarios", registrarUsuario)
@@ -166,7 +166,7 @@ func createTableIfNotExists(db *sql.DB) {
 }
 
 // Función para consumir notificaciones de la cola de RabbitMQ
-/* func consumeUserNotifications(ch *amqp.Channel) {
+func consumeUserNotifications(ch *amqp.Channel) {
 	msgs, err := ch.Consume(
 		"user_notifications", // Nombre de la cola
 		"",                   // Consumer
@@ -192,10 +192,19 @@ func createTableIfNotExists(db *sql.DB) {
 		// Aquí procesas la notificación (ej. enviar al usuario)
 		log.Printf("Notificación recibida por el User Service: %+v", notification)
 	}
-} */
+}
 
-/* func connectRabbitMQ() (*amqp.Connection, *amqp.Channel, error) {
-	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+func connectRabbitMQ() (*amqp.Connection, *amqp.Channel, error) {
+
+	port := os.Getenv("RABBITMQ_PORT")
+	if port == "" {
+		port = "5672"
+	}
+	host := os.Getenv("RABBITMQ_HOST")
+	if host == "" {
+		host = "localhost"
+	}
+	conn, err := amqp.Dial("amqp://guest:guest@" + host + ":" + port + "/")
 	if err != nil {
 		return nil, nil, fmt.Errorf("error conectando a RabbitMQ: %v", err)
 	}
@@ -221,4 +230,3 @@ func createTableIfNotExists(db *sql.DB) {
 	fmt.Println("Conectado a RabbitMQ y cola declarada")
 	return conn, ch, nil
 }
-*/

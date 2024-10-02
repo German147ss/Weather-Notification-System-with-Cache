@@ -5,5 +5,5 @@ Content-Type: application/json
 
 {
     "location_code": "242",
-    "notification_schedule": 24870
+    "notification_schedule": 23200
 }

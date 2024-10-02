@@ -2,6 +2,37 @@ version: "3.8"
 
 services:
 
+  notification-service:
+    build:
+      context: ./notification-service
+    container_name: notification-service
+    environment:
+      DB_USER: alfred
+      DB_PASSWORD: 4lfr3d
+      DB_NAME: labora
+      DB_HOST: db
+      DB_PORT: 5432
+      GOPROXY: direct
+      RABBITMQ_HOST: rabbitmqq3
+      RABBITMQ_PORT: 5672
+      WEATHER_API_BASE_URL: http://weather-service:8083
+    ports:
+      - "8085:8082"
+    depends_on:
+      - db
+      - rabbitmqq3
+    restart: always
+    networks:
+      - backend
+
+  rabbitmqq3:
+    image: rabbitmq:management
+    container_name: rabbitmqq3
+    ports:
+      - "5676:5672"
+      - "15673:15672"
+    networks:
+      - backend
   us3r-service:
     build:
       context: ./user-service
@@ -12,12 +43,18 @@ services:
       DB_NAME: labora
       DB_HOST: db
       DB_PORT: 5432
+      RABBITMQ_PORT: 5672
+      RABBITMQ_HOST: rabbitmqq3
       GOPROXY: direct
     ports:
       - "8082:8081"
     depends_on:
       - db
-    restart: always  # Asegura que el contenedor se reinicie si falla
+      - rabbitmqq3
+
+    restart: always
+    networks:
+      - backend
 
   db:
     image: postgres:12
@@ -30,6 +67,8 @@ services:
       - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks:
+      - backend 
   
   # Redis Service
   redis:
@@ -37,6 +76,8 @@ services:
     container_name: redis-service
     ports:
       - "6380:6379"
+    networks:
+      - backend
 
   # Weather Service
   weather-service:
@@ -48,8 +89,15 @@ services:
     environment:
       REDIS_PORT: 6379
       REDIS_HOST: redis
+      APP_PORT: 8083
     depends_on:
       - redis
+    networks:
+      - backend
  
 volumes:
   pgdata:
+
+networks:
+  backend:
+    driver: bridge

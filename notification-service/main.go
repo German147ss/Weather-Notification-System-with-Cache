@@ -111,6 +111,8 @@ func main() {
 
 		// Procesar las notificaciones
 		for _, notification := range notifications {
+
+			fmt.Println("Notificación:", notification)
 			if shouldSendNotification(currentTimeInSeconds, notification.NotificationSchedule) {
 				weatherResponse, err := GetWeather(notification.LocationCode)
 				if err != nil {
@@ -161,6 +163,13 @@ func initDB() *sql.DB {
 	}
 
 	createTableIfNotExists(DB)
+
+	//make ping
+	_, err = DB.Exec("SELECT 1")
+	if err != nil {
+		fmt.Println("Error pinging the database")
+	}
+
 	return DB
 }
 

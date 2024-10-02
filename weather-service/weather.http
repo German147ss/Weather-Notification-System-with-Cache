@@ -1,0 +1,23 @@
+
+### Obtener el clima de una ciudad directamente
+GET http://servicos.cptec.inpe.br/XML/cidade/242/previsao.xml
+Content-Type: text/xml
+
+### Obtener id de una ciudad directamente
+GET http://servicos.cptec.inpe.br/XML/listaCidades?city=buenos aires
+Content-Type: text/xml
+
+
+### Obtener holas directamente
+GET http://servicos.cptec.inpe.br/XML/cidade/243/dia/0/ondas.xml
+Content-Type: text/xml
+
+
+### Obtener el clima de una ciudad por su id
+GET http://localhost:8083/weather/city/buenos aires
+
+### Obtener el clima de una ciudad
+GET http://localhost:8083/weather/243
+
+### Obtener el clima de una ciudad y sus ondas
+GET http://localhost:8083/weather/waves/243
