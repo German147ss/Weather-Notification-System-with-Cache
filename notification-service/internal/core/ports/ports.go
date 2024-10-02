@@ -9,6 +9,7 @@ type NotificationRepository interface {
 
 type WeatherService interface {
 	GetWeather(city string) (*domain.CityWeather, error)
+	GetWeatherAndWaves(city string) (*domain.WeatherAndWaves, error)
 }
 
 type NotificationPublisher interface {

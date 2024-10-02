@@ -79,8 +79,7 @@ func createTableIfNotExists(db *sql.DB) {
 		id SERIAL PRIMARY KEY,
 		location_code VARCHAR(255) NOT NULL,
 		notification_schedule INT NOT NULL DEFAULT 28800,
-		is_enabled BOOLEAN NOT NULL DEFAULT TRUE,
-		state VARCHAR(255) NOT NULL DEFAULT 'pending'
+		is_enabled BOOLEAN NOT NULL DEFAULT TRUE
 	);`)
 	if err != nil {
 		fmt.Println("Error al crear tabla:", err)

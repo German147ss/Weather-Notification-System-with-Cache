@@ -46,6 +46,7 @@ services:
       RABBITMQ_PORT: 5672
       RABBITMQ_HOST: rabbitmqq3
       GOPROXY: direct
+      WEATHER_API_BASE_URL: http://weather-service:8083
     ports:
       - "8082:8081"
     depends_on:
@@ -90,6 +91,7 @@ services:
       REDIS_PORT: 6379
       REDIS_HOST: redis
       APP_PORT: 8083
+      CACHE_TYPE: redis
     depends_on:
       - redis
     networks:

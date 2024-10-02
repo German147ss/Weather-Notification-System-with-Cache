@@ -16,8 +16,9 @@ Content-Type: text/xml
 ### Obtener el clima de una ciudad por su id
 GET http://localhost:8083/weather/city/buenos aires
 
+
 ### Obtener el clima de una ciudad
-GET http://localhost:8083/weather/243
+GET http://localhost:8084/weather/243
 
 ### Obtener el clima de una ciudad y sus ondas
 GET http://localhost:8083/weather/waves/243

@@ -129,17 +129,22 @@ type WeatherAndWaves struct {
 }
 
 const maxRetries = 3
-const backoff = 2 * time.Second
+const backoff = 1 * time.Second
 
-type CPTECWeatherService struct{}
+type CPTECWeatherService struct {
+	client *http.Client
+}
 
 func NewCPTECWeatherService() ports.WeatherService {
-	return &CPTECWeatherService{}
+	client := &http.Client{
+		Timeout: time.Second * 30, // Incrementar tiempo de espera
+	}
+	return &CPTECWeatherService{client: client}
 }
 
 func (c *CPTECWeatherService) SearchIdByName(cityName string) (string, error) {
 	url := fmt.Sprintf("http://servicos.cptec.inpe.br/XML/listaCidades?city=%s", cityName)
-	resp, err := retryRequest(url, maxRetries, backoff)
+	resp, err := c.client.Get(url)
 	if err != nil {
 		fmt.Println("Error al buscar el ID de la ciudad:", err)
 		return "", err
@@ -168,7 +173,7 @@ func (c *CPTECWeatherService) SearchIdByName(cityName string) (string, error) {
 
 func (c *CPTECWeatherService) GetWeather(city string) (*domain.CityWeather, error) {
 	url := fmt.Sprintf("http://servicos.cptec.inpe.br/XML/cidade/%s/previsao.xml", city)
-	resp, err := retryRequest(url, maxRetries, backoff)
+	resp, err := c.retryRequest(url, maxRetries, backoff)
 	if err != nil {
 		return nil, err
 	}
@@ -200,7 +205,7 @@ func (c *CPTECWeatherService) GetWeather(city string) (*domain.CityWeather, erro
 // Get waves from CPTEC
 func (c *CPTECWeatherService) GetWaves(city string) (*domain.CityWaves, error) {
 	url := fmt.Sprintf("http://servicos.cptec.inpe.br/XML/cidade/%s/dia/0/ondas.xml", city)
-	resp, err := retryRequest(url, maxRetries, backoff)
+	resp, err := c.retryRequest(url, maxRetries, backoff)
 	if err != nil {
 		return nil, err
 	}
@@ -227,12 +232,12 @@ func (c *CPTECWeatherService) GetWaves(city string) (*domain.CityWaves, error) {
 	return &result, nil
 }
 
-func retryRequest(url string, maxRetries int, backoff time.Duration) (*http.Response, error) {
+func (c *CPTECWeatherService) retryRequest(url string, maxRetries int, backoff time.Duration) (*http.Response, error) {
 	var resp *http.Response
 	var err error
 
 	for i := 0; i < maxRetries; i++ {
-		resp, err = http.Get(url)
+		resp, err = c.client.Get(url)
 		if err == nil {
 			return resp, nil
 		}

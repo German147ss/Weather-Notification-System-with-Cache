@@ -3,7 +3,9 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -12,6 +14,44 @@ import (
 	_ "github.com/lib/pq"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
+
+type CityWeather struct {
+	Name       string     `json:"name"`
+	State      string     `json:"state"`
+	LastUpdate string     `json:"last_update"`
+	Forecasts  []Forecast `json:"forecasts"`
+}
+
+type Forecast struct {
+	Day     string  `json:"day"`
+	Weather string  `json:"weather"`
+	MaxTemp int     `json:"max_temp"`
+	MinTemp int     `json:"min_temp"`
+	UvIndex float32 `json:"uv_index"`
+}
+
+type CityWaves struct {
+	Name       string         `json:"name"`
+	State      string         `json:"state"`
+	LastUpdate string         `json:"last_update"`
+	Morning    WavePrediction `json:"morning"`
+	Afternoon  WavePrediction `json:"afternoon"`
+	Night      WavePrediction `json:"night"`
+}
+
+type WavePrediction struct {
+	Day        string  `json:"day"`
+	SeaStatus  string  `json:"sea_status"`
+	WaveHeight float64 `json:"wave_height"`
+	WaveDir    string  `json:"wave_direction"`
+	WindSpeed  float64 `json:"wind_speed"`
+	WindDir    string  `json:"wind_direction"`
+}
+
+type WeatherAndWaves struct {
+	Weather *CityWeather `json:"weather"`
+	Waves   *CityWaves   `json:"waves"`
+}
 
 // Estructura del usuario
 type Usuario struct {
@@ -51,26 +91,74 @@ func registrarUsuario(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Datos de usuario inválidos", http.StatusBadRequest)
 		return
 	}
+	go func() {
+		err = InsertUser(usuario)
+		if err != nil {
+			fmt.Println("Error al insertar usuario:", err)
+			return
+		}
+	}()
 
-	// Preparar la consulta SQL para insertar el nuevo usuario
-	sqlInsert := `INSERT INTO user_preferences (location_code, notification_schedule) VALUES ($1, $2) RETURNING id`
-
-	// Ejecutar la consulta e insertar el usuario
-	err = DB.QueryRow(sqlInsert, usuario.LocationCode, usuario.NotificationSchedule).Scan(&usuario.ID)
+	weatherAndWaves, err := GetWeatherAndWaves(usuario.LocationCode)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Error al insertar usuario: %v", err), http.StatusInternalServerError)
+		fmt.Println("Error al obtener datos del clima:", err)
 		return
 	}
 
 	// Retornar el usuario registrado en formato JSON
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(usuario)
+	json.NewEncoder(w).Encode(weatherAndWaves)
+}
+
+func GetWeatherAndWaves(city string) (*WeatherAndWaves, error) {
+	baseURL := os.Getenv("WEATHER_API_BASE_URL")
+	if baseURL == "" {
+		return nil, errors.New("WEATHER_API_BASE_URL environment variable not set")
+	}
+
+	url := baseURL + "/weather/waves/" + city
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.New("error fetching weather data")
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var weather WeatherAndWaves
+	err = json.Unmarshal(body, &weather)
+	if err != nil {
+		return nil, err
+	}
+
+	return &weather, nil
+}
+
+func InsertUser(usuario Usuario) error {
+	// Preparar la consulta SQL para insertar el nuevo usuario
+	sqlInsert := `INSERT INTO user_preferences (location_code, notification_schedule) VALUES ($1, $2) RETURNING id`
+
+	// Ejecutar la consulta e insertar el usuario
+	err := DB.QueryRow(sqlInsert, usuario.LocationCode, usuario.NotificationSchedule).Scan(&usuario.ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Funcion para dar de baja las notificaciones de un usuario
 func desactivarNotificaciones(w http.ResponseWriter, r *http.Request) {
 	// Obtener el ID del usuario desde la URL
-	id := r.URL.Path[len("/desactivar/"):]
+	id := r.URL.Path[len("/opt-out/"):]
 	fmt.Println("ID del usuario:", id)
 
 	// Desactivar las notificaciones para el usuario
@@ -109,10 +197,10 @@ func main() {
 	go consumeUserNotifications(ch)
 
 	// Ruta para registrar un nuevo usuario
-	http.HandleFunc("/usuarios", registrarUsuario)
+	http.HandleFunc("/register", registrarUsuario)
 
 	// Ruta para desactivar las notificaciones de un usuario
-	http.HandleFunc("/desactivar/", desactivarNotificaciones)
+	http.HandleFunc("/opt-out/", desactivarNotificaciones)
 
 	// Iniciar el servidor HTTP
 	fmt.Println("Servidor iniciado en el puerto 8081")
@@ -156,8 +244,7 @@ func createTableIfNotExists(db *sql.DB) {
 		id SERIAL PRIMARY KEY,
 		location_code VARCHAR(255) NOT NULL,
 		notification_schedule INT NOT NULL DEFAULT 28800,
-		is_enabled BOOLEAN NOT NULL DEFAULT TRUE,
-		state VARCHAR(255) NOT NULL DEFAULT 'pending'
+		is_enabled BOOLEAN NOT NULL DEFAULT TRUE
 	);`)
 	if err != nil {
 		fmt.Println("Error al crear tabla:", err)
