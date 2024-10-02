@@ -20,7 +20,16 @@ func NewUserService(repo ports.UserRepository, weatherService ports.WeatherServi
 }
 
 func (s *UserService) RegisterUser(user entities.User) (*entities.WeatherAndWaves, error) {
-	err := s.UserRepository.InsertUser(user)
+	locationCode, err := s.WeatherService.GetLocationCode(user.LocationCode)
+	if err != nil {
+		return nil, err
+	}
+	if locationCode == "" {
+		return nil, err
+	}
+	user.LocationCode = locationCode
+
+	err = s.UserRepository.InsertUser(user)
 	if err != nil {
 		return nil, err
 	}

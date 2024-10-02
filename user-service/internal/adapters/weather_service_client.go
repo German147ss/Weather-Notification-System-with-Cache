@@ -50,3 +50,34 @@ func (s *WeatherServiceClient) GetWeatherAndWaves(city string) (*entities.Weathe
 
 	return &weather, nil
 }
+
+func (s *WeatherServiceClient) GetLocationCode(city string) (string, error) {
+	baseURL := os.Getenv("WEATHER_API_BASE_URL")
+	if baseURL == "" {
+		return "", errors.New("WEATHER_API_BASE_URL environment variable not set")
+	}
+
+	url := baseURL + "/weather/city/" + city
+	resp, err := s.client.Get(url)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return "", errors.New("error fetching weather data")
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	var locationCode string
+	err = json.Unmarshal(body, &locationCode)
+	if err != nil {
+		return "", err
+	}
+
+	return locationCode, nil
+}
