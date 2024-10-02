@@ -1,7 +1,7 @@
 # meli-challenge
 
 ## Descripción
-Tengo una API de usuarios que permite guardar los datos del usuario basándose en la solicitud del cliente. Además, al momento del registro, devuelve la información meteorológica de la ubicación del usuario por primera vez. La API también permite programar notificaciones diarias que se enviarán a través de una cola de mensajes.
+Tengo una API de usuarios que permite guardar los datos del usuario basándose en la solicitud del cliente. Además, al momento del registro, devuelve la información meteorológica de la ubicación del usuario por primera vez. La API también permite programar notificaciones diarias que se recibiran a través de una cola de mensajes.
 
 La API de clima incorpora un manejo de caché para reducir la carga en la API externa y evitar solicitudes duplicadas, optimizando así el tiempo de respuesta y el uso de recursos.
 
@@ -27,8 +27,17 @@ POST http://localhost:8082/register
 Content-Type: application/json
 
 {
-    "location_code": "242",
+    "location_code": "buenos aires",
     "notification_schedule": 23200
+}
+
+### Registrar un nuevo usuario
+POST http://localhost:8082/register
+Content-Type: application/json
+
+{
+    "location_code": "rio de janeiro",
+    "notification_schedule": 23260
 }
 ```
 
