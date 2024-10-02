@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	"user-service/internal/entities"
 	"user-service/internal/ports"
 )
@@ -25,7 +26,7 @@ func (s *UserService) RegisterUser(user entities.User) (*entities.WeatherAndWave
 		return nil, err
 	}
 	if locationCode == "" {
-		return nil, err
+		return nil, errors.New("location code not found")
 	}
 	user.LocationCode = locationCode
 

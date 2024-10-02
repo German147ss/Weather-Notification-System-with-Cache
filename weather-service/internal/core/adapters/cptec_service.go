@@ -225,8 +225,8 @@ func (c *CPTECWeatherService) GetWaves(city string) (*domain.CityWaves, error) {
 	var waves CptecWavesResponse
 	err = decoder.Decode(&waves)
 	if err != nil {
-		fmt.Println("Error al decodificar el XML:", err)
-		return nil, err
+		fmt.Printf("error al decodificar el XML: %v, se procede a ignorar", err)
+		return nil, nil
 	}
 	result := waves.GetWaves()
 	return &result, nil
