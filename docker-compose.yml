@@ -96,6 +96,8 @@ services:
       - redis
     networks:
       - backend
+    dns:
+      - 8.8.8.8
  
 volumes:
   pgdata:
