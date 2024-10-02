@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 	"user-service/internal/entities"
 	"user-service/internal/ports"
 )
@@ -73,11 +74,10 @@ func (s *WeatherServiceClient) GetLocationCode(city string) (string, error) {
 		return "", err
 	}
 
-	var locationCode string
+	var locationCode int
 	err = json.Unmarshal(body, &locationCode)
 	if err != nil {
 		return "", err
 	}
-
-	return locationCode, nil
+	return strconv.Itoa(locationCode), nil
 }

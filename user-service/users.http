@@ -5,6 +5,15 @@ POST http://localhost:8082/register
 Content-Type: application/json
 
 {
-    "location_code": "242",
+    "location_code": "buenos aires",
     "notification_schedule": 23200
+}
+
+### Registrar un nuevo usuario
+POST http://localhost:8082/register
+Content-Type: application/json
+
+{
+    "location_code": "rio de janeiro",
+    "notification_schedule": 23260
 }
