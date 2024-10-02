@@ -1,17 +1,9 @@
 # meli-challenge
-- Se da de alta el usuario.
-Se carga su ciudad y se obtiene su prevision del tiempo -> la busca en el servicio de clima, este lo devuelve
-y se muestra.
-Se dispara un job para enviar notificaciones.
 
-- Se da de baja el usuario para las notificaciones.
+## Descripción
+Tengo una API de usuarios que permite guardar los datos del usuario basándose en la solicitud del cliente. Además, al momento del registro, devuelve la información meteorológica de la ubicación del usuario por primera vez. La API también permite programar notificaciones diarias que se enviarán a través de una cola de mensajes.
 
+La API de clima incorpora un manejo de caché para reducir la carga en la API externa y evitar solicitudes duplicadas, optimizando así el tiempo de respuesta y el uso de recursos.
 
-se da de alta en el job que busca cada hora para notificarle a los usuarios.
-
-
-Por otro lado el servicio de clima estara pendiente de cada solicitud para devolver el clima segun la ciudad, donde primero se solicita si esta cacheada
-si no esta cacheada se busca cptec, se devuelve y se cachea.
-El cache dura una hora, cada hora se realiza la solicutd al cptec.
-
+Finalmente, tenemos un servicio de notificaciones que ejecuta un cron cada minuto. Este servicio verifica en la tabla de preferencias de usuario si hay notificaciones programadas. Si encuentra alguna, obtiene la información meteorológica actual y publica la notificación en el canal de la cola de mensajes.
 
