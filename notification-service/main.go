@@ -26,20 +26,20 @@ func fetchScheduledNotifications(db *sql.DB) ([]Notification, error) {
 	var notifications []Notification
 
 	// Obtener la hora actual
-	//now := time.Now()
+	begin := getCurrentTimeInSeconds()
 
-	// Definir el rango de tiempo (ejemplo: notificaciones que deben enviarse en los próximos 15 minutos)
-	//timeRange := now.Add(15 * time.Minute)
+	// rango
+	ends := begin + 59
 
 	// Consulta SQL para obtener las notificaciones pendientes en el rango de tiempo
 	query := `
-        SELECT id, location_code, notification_schedule, state
+        SELECT id, location_code, notification_schedule
         FROM user_preferences
-        WHERE state = 'pending' AND is_enabled = true
+        WHERE is_enabled = true AND notification_schedule >= $1 AND notification_schedule <= $2
     `
 
 	// Ejecutar la consulta
-	rows, err := db.Query(query)
+	rows, err := db.Query(query, begin, ends)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			fmt.Println("No hay notificaciones programadas")
@@ -52,7 +52,7 @@ func fetchScheduledNotifications(db *sql.DB) ([]Notification, error) {
 	// Iterar sobre los resultados
 	for rows.Next() {
 		var notification Notification
-		err := rows.Scan(&notification.ID, &notification.LocationCode, &notification.NotificationSchedule, &notification.State)
+		err := rows.Scan(&notification.ID, &notification.LocationCode, &notification.NotificationSchedule)
 		if err != nil {
 			log.Printf("Error al escanear notificación: %v", err)
 			continue
@@ -107,12 +107,9 @@ func main() {
 		if err != nil {
 			log.Fatalf("Error obteniendo notificaciones: %v", err)
 		}
-		fmt.Println("Notificaciones programadas:")
 
 		// Procesar las notificaciones
 		for _, notification := range notifications {
-
-			fmt.Println("Notificación:", notification)
 			if shouldSendNotification(currentTimeInSeconds, notification.NotificationSchedule) {
 				weatherResponse, err := GetWeather(notification.LocationCode)
 				if err != nil {
