@@ -9,7 +9,7 @@ Finalmente, tenemos un servicio de notificaciones que ejecuta un cron cada minut
 
 ## Diagrama
 
-![diagrama](diagrama.png)
+![diagrama](diagram.png)
 
 ## Correr el proyecto
 
