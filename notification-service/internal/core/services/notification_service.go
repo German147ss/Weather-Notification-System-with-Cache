@@ -33,28 +33,21 @@ func (s *NotificationService) SendScheduledNotifications() {
 		fmt.Printf("Error obteniendo notificaciones: %v\n", err)
 		return
 	}
+	fmt.Printf("Notificaciones obtenidas: %+v\n", notifications)
 
 	for _, notification := range notifications {
-		if shouldSendNotification(currentTimeInSeconds, notification.NotificationSchedule) {
-			weatherResponse, err := s.WeatherService.GetWeather(notification.LocationCode)
-			if err != nil {
-				fmt.Printf("Error obteniendo clima para la ciudad: %+v\n", err)
-				continue
-			}
-			fmt.Printf("Clima obtenido para la ciudad: %+v\n", weatherResponse)
-			err = s.NotificationPubl.Publish(*weatherResponse)
-			if err != nil {
-				fmt.Printf("Error al publicar notificación: %v\n", err)
-			}
-		} else {
-			fmt.Printf("Notificación %d no está dentro del horario actual\n", notification.ID)
+		weatherResponse, err := s.WeatherService.GetWeatherAndWaves(notification.LocationCode)
+		if err != nil {
+			fmt.Printf("Error obteniendo clima para la ciudad: %+v\n", err)
+			continue
 		}
-	}
-}
+		fmt.Printf("Clima obtenido para la ciudad: %+v\n", weatherResponse)
+		err = s.NotificationPubl.Publish(*weatherResponse)
+		if err != nil {
+			fmt.Printf("Error al publicar notificación: %v\n", err)
+		}
 
-// Función para verificar si se debe enviar la notificación
-func shouldSendNotification(currentTimeInSeconds, notificationSchedule int) bool {
-	return currentTimeInSeconds >= notificationSchedule && currentTimeInSeconds < (notificationSchedule+59)
+	}
 }
 
 // Función para obtener el horario actual del día en segundos

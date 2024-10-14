@@ -37,7 +37,7 @@ func (c *RabbitMQNotificationConsumer) ConsumeUserNotifications() error {
 
 	go func() {
 		for d := range msgs {
-			var notification entities.WeatherResponse
+			var notification entities.WeatherAndWaves
 			if err := json.Unmarshal(d.Body, &notification); err != nil {
 				log.Printf("error deserializing notification: %v", err)
 				continue

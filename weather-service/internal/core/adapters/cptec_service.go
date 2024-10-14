@@ -164,7 +164,7 @@ func (c *CPTECWeatherService) SearchIdByName(cityName string) (string, error) {
 	var city CptecCiudadesReponse
 	err = decoder.Decode(&city)
 	if err != nil {
-		fmt.Println("Error al decodificar el XML:", err)
+		fmt.Println("SearchIdByName - Error al decodificar el XML:", err)
 		return "", err
 	}
 
@@ -193,7 +193,7 @@ func (c *CPTECWeatherService) GetWeather(city string) (*domain.CityWeather, erro
 	var weather CptcResponse
 	err = decoder.Decode(&weather)
 	if err != nil {
-		fmt.Println("Error al decodificar el XML:", err)
+		fmt.Println("GetWeather - Error al decodificar el XML:", err)
 		return nil, err
 	}
 
@@ -225,7 +225,7 @@ func (c *CPTECWeatherService) GetWaves(city string) (*domain.CityWaves, error) {
 	var waves CptecWavesResponse
 	err = decoder.Decode(&waves)
 	if err != nil {
-		fmt.Printf("error al decodificar el XML: %v, se procede a ignorar", err)
+		fmt.Printf("GetWaves - error al decodificar el XML: %v, se procede a ignorar", err)
 		return nil, nil
 	}
 	result := waves.GetWaves()

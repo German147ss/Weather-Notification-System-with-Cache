@@ -13,5 +13,5 @@ type WeatherService interface {
 }
 
 type NotificationPublisher interface {
-	Publish(notification domain.CityWeather) error
+	Publish(notification domain.WeatherAndWaves) error
 }

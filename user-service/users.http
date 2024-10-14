@@ -5,15 +5,16 @@ POST http://localhost:8082/register
 Content-Type: application/json
 
 {
-    "location_code": "sao pablo",
-    "notification_schedule": 23200
+    "location_code": "Sao Paulo",
+    "notification_schedule": 55186
 }
 
-### Registrar un nuevo usuario
+
+### Registrar un nuevo usuario litorano
 POST http://localhost:8082/register
 Content-Type: application/json
 
 {
     "location_code": "florianopolis",
-    "notification_schedule": 23260
+    "notification_schedule": 49970
 }

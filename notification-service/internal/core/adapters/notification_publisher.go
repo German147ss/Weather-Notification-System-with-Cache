@@ -17,7 +17,7 @@ func NewRabbitMQNotificationPublisher(channel *amqp.Channel) ports.NotificationP
 	return &RabbitMQNotificationPublisher{Channel: channel}
 }
 
-func (p *RabbitMQNotificationPublisher) Publish(notification domain.CityWeather) error {
+func (p *RabbitMQNotificationPublisher) Publish(notification domain.WeatherAndWaves) error {
 	body, err := json.Marshal(notification)
 	if err != nil {
 		return fmt.Errorf("error al convertir notificación a JSON: %v", err)
