@@ -10,10 +10,10 @@ COPY go.mod go.sum ./
 COPY . .
 
 # Compilar el servicio usando las dependencias de vendor/
-RUN go build -mod=vendor -o us3r-service .
+RUN go build -mod=vendor -o user-service .
 
 # Exponer el puerto
 EXPOSE 8081
 
 # Comando para ejecutar el servicio
-CMD ["./us3r-service"]
+CMD ["./user-service"]

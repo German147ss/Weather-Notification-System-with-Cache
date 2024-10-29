@@ -7,17 +7,17 @@ services:
       context: ./notification-service
     container_name: notification-service
     environment:
-      DB_USER: alfred
-      DB_PASSWORD: 4lfr3d
-      DB_NAME: labora
-      DB_HOST: db
-      DB_PORT: 5432
-      GOPROXY: direct
-      RABBITMQ_HOST: rabbitmqq3
-      RABBITMQ_PORT: 5672
-      WEATHER_API_BASE_URL: http://weather-service:8083
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      GOPROXY: ${GOPROXY}
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+      RABBITMQ_PORT: ${RABBITMQ_PORT}
+      WEATHER_API_BASE_URL: ${WEATHER_API_BASE_URL}
     ports:
-      - "8085:8082"
+      - "${NOTIFICATION_SERVICE_PORT}"
     depends_on:
       - db
       - rabbitmqq3
@@ -29,30 +29,30 @@ services:
     image: rabbitmq:management
     container_name: rabbitmqq3
     ports:
-      - "5676:5672"
-      - "15673:15672"
+      - "${RABBITMQ_PORT}:5672"
+      - "${RABBITMQ_MANAGEMENT_PORT}:15672"
     networks:
       - backend
-  us3r-service:
+
+  user-service:
     build:
       context: ./user-service
-    container_name: us3r-service
+    container_name: user-service
     environment:
-      DB_USER: alfred
-      DB_PASSWORD: 4lfr3d
-      DB_NAME: labora
-      DB_HOST: db
-      DB_PORT: 5432
-      RABBITMQ_PORT: 5672
-      RABBITMQ_HOST: rabbitmqq3
-      GOPROXY: direct
-      WEATHER_API_BASE_URL: http://weather-service:8083
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      RABBITMQ_PORT: ${RABBITMQ_PORT}
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+      GOPROXY: ${GOPROXY}
+      WEATHER_API_BASE_URL: ${WEATHER_API_BASE_URL}
     ports:
-      - "8082:8081"
+      - "${USER_SERVICE_PORT}"
     depends_on:
       - db
       - rabbitmqq3
-
     restart: always
     networks:
       - backend
@@ -60,45 +60,43 @@ services:
   db:
     image: postgres:12
     environment:
-      POSTGRES_USER: alfred
-      POSTGRES_PASSWORD: 4lfr3d
-      POSTGRES_DB: labora
-    restart: always  # Asegura que el contenedor se reinicie si falla
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    restart: always
     ports:
-      - "5433:5432"
+      - "${DB_PORT_MAP}"
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
       - backend 
-  
-  # Redis Service
+
   redis:
     image: redis:alpine
     container_name: redis-service
     ports:
-      - "6380:6379"
+      - "${REDIS_PORT_MAP}"
     networks:
       - backend
 
-  # Weather Service
   weather-service:
     build:
       context: ./weather-service
     container_name: weather-new-service
     ports:
-      - "8084:8083"
+      - "${WEATHER_SERVICE_PORT}"
     environment:
-      REDIS_PORT: 6379
-      REDIS_HOST: redis
-      APP_PORT: 8083
-      CACHE_TYPE: redis
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_HOST: ${REDIS_HOST}
+      APP_PORT: ${APP_PORT}
+      CACHE_TYPE: ${CACHE_TYPE}
     depends_on:
       - redis
     networks:
       - backend
     dns:
       - 8.8.8.8
- 
+
 volumes:
   pgdata:
 
