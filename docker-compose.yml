@@ -2,6 +2,16 @@ version: "3.8"
 
 services:
 
+  api-gateway:
+    image: nginx:alpine
+    container_name: api-gateway
+    ports:
+      - "${API_GATEWAY_PORT}:80"  # Mapea el puerto 80 del contenedor al puerto que elijas en .env
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf  # Asegúrate de tener el archivo de configuración nginx.conf
+    networks:
+      - backend
+
   notification-service:
     build:
       context: ./notification-service

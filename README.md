@@ -1,4 +1,4 @@
-# meli-challenge
+# Distributed Weather Notification Microservices with Caching and Messaging Queue Integration
 
 ## Descripción
 El sistema se compone de: una API de usuarios que permite guardar los datos del usuario basándose en la solicitud del cliente. Además, al momento del registro, devuelve la información meteorológica de la ubicación del usuario por primera vez. La API también permite programar notificaciones diarias que se recibiran a través de una cola de mensajes.

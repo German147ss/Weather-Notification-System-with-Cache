@@ -5,11 +5,15 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sync"
 	"user-service/internal/entities"
 	"user-service/internal/ports"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 )
+
+var Mu sync.Mutex
+var Notifications []string
 
 type RabbitMQNotificationConsumer struct {
 	Channel *amqp.Channel
@@ -42,7 +46,9 @@ func (c *RabbitMQNotificationConsumer) ConsumeUserNotifications() error {
 				log.Printf("error deserializing notification: %v", err)
 				continue
 			}
-			log.Printf("received notification: %+v", notification)
+			Mu.Lock()
+			Notifications = append(Notifications, string(d.Body))
+			Mu.Unlock()
 		}
 	}()
 	return nil

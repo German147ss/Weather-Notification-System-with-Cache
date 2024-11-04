@@ -56,6 +56,13 @@ func main() {
 		w.Write([]byte("Notificaciones desactivadas para el usuario"))
 	})
 
+	http.HandleFunc("/notifications", func(w http.ResponseWriter, r *http.Request) {
+		adapters.Mu.Lock()
+		defer adapters.Mu.Unlock()
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(adapters.Notifications)
+	})
+
 	// Start HTTP server
 	fmt.Println("Servidor iniciado en el puerto 8081")
 	if err := http.ListenAndServe(":8081", nil); err != nil {

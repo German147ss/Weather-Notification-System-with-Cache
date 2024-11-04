@@ -24,11 +24,12 @@ func InitDB() *sql.DB {
 	for i := 0; i < 5; i++ {
 		db, err = sql.Open("postgres", connectionString)
 		if err == nil && db.Ping() == nil {
+			fmt.Println("Err", err)
 			fmt.Println("Successfully connected to the database.")
 			break
 		}
-		fmt.Println("Error connecting to the database, retrying in 5 seconds...")
-		time.Sleep(5 * time.Second)
+		fmt.Println("Error connecting to the database, retrying in 3 seconds...", err)
+		time.Sleep(3 * time.Second)
 	}
 
 	if err != nil {

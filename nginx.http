@@ -1,0 +1,8 @@
+### Test Notifications Service
+GET http://localhost/notifications/
+
+### Test Users Service
+GET http://localhost/users/
+
+### Test Weather Service
+GET http://localhost/weather/waves/243
