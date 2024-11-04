@@ -1,33 +1,38 @@
 # Distributed Weather Notification Microservices with Caching and Messaging Queue Integration
-## Resumen
-Este proyecto consiste en una arquitectura de microservicios diseñada para enviar notificaciones de previsión meteorológica y condiciones de olas a los usuarios. La solución ha sido diseñada con una estructura escalable y resiliente, permitiendo una fácil expansión para integrar otros tipos de notificaciones en el futuro, como SMS o correos electrónicos.
 
-## Descripción
-El sistema se compone de: una API de usuarios que permite guardar los datos del usuario basándose en la solicitud del cliente. Además, al momento del registro, devuelve la información meteorológica de la ubicación del usuario por primera vez. La API también permite programar notificaciones diarias que se recibiran a través de una cola de mensajes y dar de baja la programación de notificaciones.
+- [Version in Spanish](README_ES.md)
 
-La API de clima incorpora un manejo de caché para reducir la carga en la API externa y evitar solicitudes duplicadas, optimizando así el tiempo de respuesta y el uso de recursos.
+## Summary
 
-Finalmente, tenemos un servicio de notificaciones que ejecuta un cron cada minuto. Este servicio verifica en la tabla de preferencias de usuario si hay notificaciones programadas. Si encuentra alguna, obtiene la información meteorológica actual y publica la notificación en el canal de la cola de mensajes.
+This project consists of a microservices architecture designed to send weather forecasts and wave conditions notifications to users. The solution is designed with a scalable and resilient structure, allowing for easy expansion to integrate other types of notifications in the future, such as SMS or emails.
 
-Ví la necesidad de separar el sistema en microservicios para que cada uno de ellos pueda ser escalable con posibilidad de agregar otros servicios (como los mencionados en la consigna).
+## Description
+The system is composed of: a user API that allows storing user data based on the client's request. Additionally, at the time of registration, it returns the weather information for the user's location for the first time. The API also enables scheduling daily notifications that will be received through a message queue and unsubscribing from notification scheduling.
 
-## Diagrama
+The weather API incorporates cache handling to reduce the load on the external API and avoid duplicate requests, thus optimizing response time and resource usage.
 
-![diagrama](diagram.png)
+Finally, there is a notification service that runs a cron job every minute. This service checks the user preferences table for scheduled notifications. If it finds any, it retrieves the current weather information and publishes the notification to the message queue channel.
 
-## Correr el proyecto
+I saw the need to separate the system into microservices so that each one can be scalable with the possibility of adding other services (as mentioned in the requirements).
+
+## Diagram
+
+![diagram](diagram.png)
+
+## Run the project
 
 ```bash
 docker-compose up --build
 ```
 
-## Pruebas
+## Tests
 
-### Registrar un nuevo usuario
-Se carga el codigo de locacion y el tiempo de notificación diarias en la tabla de preferencias de usuario.
+### Register a new user
+
+The location code and daily notification time are loaded into the user preferences table.
 
 ```bash
-### Registrar un nuevo usuario 
+### Register a new user 
 POST http://localhost:8082/register
 Content-Type: application/json
 
@@ -36,7 +41,7 @@ Content-Type: application/json
     "notification_schedule": 23200
 }
 
-### Registrar un nuevo usuario litoral
+### ### Register a new litoral user 
 POST http://localhost:8082/register
 Content-Type: application/json
 
