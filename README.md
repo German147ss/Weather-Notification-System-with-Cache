@@ -1,7 +1,5 @@
 # Distributed Weather Notification Microservices with Caching and Messaging Queue Integration
 
-- [ES Version](README_ES.md)
-
 ## Summary
 
 This project consists of a microservices architecture designed to send weather forecasts and wave conditions notifications to users. The solution is designed with a scalable and resilient structure, allowing for easy expansion to integrate other types of notifications in the future, such as SMS or emails.
