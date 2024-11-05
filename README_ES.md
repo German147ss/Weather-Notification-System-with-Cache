@@ -5,6 +5,10 @@
 
 Este proyecto consiste en una arquitectura de microservicios diseñada para enviar notificaciones de previsión meteorológica y condiciones de olas a los usuarios. La solución ha sido diseñada con una estructura escalable y resiliente, permitiendo una fácil expansión para integrar otros tipos de notificaciones en el futuro, como SMS o correos electrónicos.
 
+## Diagram
+
+![diagram](diagram.jpg)
+
 ## Descripción
 El sistema se compone de: una API de usuarios que permite guardar los datos del usuario basándose en la solicitud del cliente. Además, al momento del registro, devuelve la información meteorológica de la ubicación del usuario por primera vez. La API también permite programar notificaciones diarias que se recibiran a través de una cola de mensajes y dar de baja la programación de notificaciones.
 

@@ -1,10 +1,14 @@
 # Distributed Weather Notification Microservices with Caching and Messaging Queue Integration
 
-- [Version in Spanish](README_ES.md)
+- [ES Version](README_ES.md)
 
 ## Summary
 
 This project consists of a microservices architecture designed to send weather forecasts and wave conditions notifications to users. The solution is designed with a scalable and resilient structure, allowing for easy expansion to integrate other types of notifications in the future, such as SMS or emails.
+
+## Diagram
+
+![diagram](diagram.jpg)
 
 ## Description
 The system is composed of: a user API that allows storing user data based on the client's request. Additionally, at the time of registration, it returns the weather information for the user's location for the first time. The API also enables scheduling daily notifications that will be received through a message queue and unsubscribing from notification scheduling.
@@ -15,9 +19,7 @@ Finally, there is a notification service that runs a cron job every minute. This
 
 I saw the need to separate the system into microservices so that each one can be scalable with the possibility of adding other services (as mentioned in the requirements).
 
-## Diagram
 
-![diagram](diagram.png)
 
 ## Run the project
 
@@ -50,6 +52,9 @@ Content-Type: application/json
     "notification_schedule": 23260
 }
 ```
+
+- [ES Version](README_ES.md)
+
 
 
 
