@@ -1,5 +1,8 @@
 # Distributed Weather Notification Microservices with Caching and Messaging Queue Integration
 
+[![Go Reference](https://pkg.go.dev/badge/gocv.io/x/gocv.svg)](https://pkg.go.dev/gocv.io/x/gocv)
+
+
 ## Summary
 
 This project consists of a microservices architecture designed to send weather forecasts and wave conditions notifications to users. The solution is designed with a scalable and resilient structure, allowing for easy expansion to integrate other types of notifications in the future, such as SMS or emails.
